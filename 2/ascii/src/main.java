@@ -5,6 +5,7 @@ import java.io.*;
 import java.lang.Math;
 
 
+
 public final class main {
     boolean negative;
     float min = 1.0f / 255.0f;
@@ -88,11 +89,13 @@ public final class main {
 
     public static void main(String[] args) {
         File f = new File("/home/vladimir/tmp/img3.png");
+
         try {
-            final BufferedImage image = ImageIO.read(f);
-            if (image == null)
-                throw new IllegalArgumentException("didn't read image");
-            final String ascii = new main().convert(image);
+            AsciiImage image = new AsciiImage(f, AsciiImage.default_palette);
+
+            image = image.getRectangle(image.getWidth(), 0, 0, image.getHeight());
+
+            final String ascii = image.getImage();
             System.out.println(ascii);
             System.exit(0);
         } catch (IOException e) {
