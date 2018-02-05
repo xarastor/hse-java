@@ -3,7 +3,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.Math;
-
+import java.util.Vector;
 
 
 public final class main {
@@ -95,11 +95,31 @@ public final class main {
 
             image = image.getRectangle(image.getWidth(), 0, 0, image.getHeight());
 
-            final String ascii = image.getImage();
+            final String ascii = image.getAsciiImage();
+
+
+
+            Vector<AsciiImage> subs = image.splitByThreshold(0.9);
+            for (int i = 0; i < subs.size(); ++i) {
+                System.out.println(subs.get(i).getAsciiImage());
+            }
+            // BufferedImage realImage = image.convertToImage();
+            // ImageIO.write(realImage, "png", new File("/home/vladimir/tmp/img5.png"));
             System.out.println(ascii);
             System.exit(0);
         } catch (IOException e) {
             System.err.println(e);
         }
+    }
+
+    private static BufferedImage toBufferedImage(Image src) {
+        int w = src.getWidth(null);
+        int h = src.getHeight(null);
+        int type = BufferedImage.TYPE_INT_RGB;  // other options
+        BufferedImage dest = new BufferedImage(w, h, type);
+        Graphics2D g2 = dest.createGraphics();
+        g2.drawImage(src, 0, 0, null);
+        g2.dispose();
+        return dest;
     }
 }

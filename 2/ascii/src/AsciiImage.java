@@ -1,15 +1,21 @@
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.image.WritableRaster;
+import java.util.Iterator;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.Math;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
+import java.util.Stack;
+
 
 public class AsciiImage {
     private double[] content;
     private int width = 0;
     private int height = 0;
-
-
 
     static char[] default_palette = "MWNXK0Okxdolc:;,'...   ".toCharArray(); // {' ', '.', '*', '#'};
     private char[] ascii_palette = default_palette;
@@ -64,7 +70,7 @@ public class AsciiImage {
         this.ascii_palette = ascii_palette;
     }
 
-    public String getImage(){
+    public String getAsciiImage(){
         StringBuilder ascii = new StringBuilder((width + 1) * height);
         for (int y = 0, i = 0; y < this.height; ++y) {
             for (int x = 0; x < this.width; ++x, ++i) {
@@ -123,5 +129,83 @@ public class AsciiImage {
         return newImage;
     }
 
+    public AsciiImage invert() {
+        int len = this.width * this.height;
+        for (int i = 0; i < len; ++i) {
+            this.content[i] = 1 - this.content[i];
+        }
 
+        return this;
+    }
+
+    public Vector<AsciiImage> splitByThreshold(double threshold) {
+        Vector<AsciiImage> images = new Vector<AsciiImage>();
+
+        List<Integer> xs = new Vector<Integer>();
+        List<Integer> ys = new Vector<Integer>();
+
+        // horizontal lines, fill ys
+        for (int y = 0; y < this.height; ++y) {
+            boolean free_line = true;
+            for (int x = 0; x < this.width; ++x) {
+                if (this.content[y * this.width + x] >= threshold) {
+                    free_line = false;
+                    break;
+                }
+            }
+            if (free_line) {
+                ys.add(y);
+            }
+        }
+
+        // vertical lines, fill xs
+        for (int x = 0; x < this.width; ++x) {
+            boolean free_line = true;
+            for (int y = 0; y < this.height; ++y) {
+                if (this.content[y * this.width + x] >= threshold) {
+                    free_line = false;
+                    break;
+                }
+            }
+            if (free_line) {
+                xs.add(x);
+            }
+        }
+
+
+        int yprev = 0;
+
+        int xprev = 0;
+        for (int i = 0; i < ys.size(); ++i) {
+            int ycur = ys.get(i);
+
+
+            xprev = 0;
+            for (int j = 0; j < xs.size(); ++j) {
+                int xcur = xs.get(j);
+
+                images.add(this.getRectangle(xprev, yprev, xcur, ycur));
+                xprev = xcur;
+            }
+            images.add(this.getRectangle(xprev, yprev, this.width, ycur));
+
+            yprev = ycur;
+        }
+        images.add(this.getRectangle(xprev, yprev, this.width, this.height));
+
+        return images;
+    }
+
+    public BufferedImage convertToImage() throws IOException {
+        byte[] pixels = new byte[this.width * this.height];
+        int len = this.width * this.height;
+
+        for (int i = 0; i < len; ++i) {
+            pixels[i] = (byte) ((this.content[i]-0.5) *  255 - 128);
+            System.out.println((pixels[i]));
+        }
+
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(pixels));
+        return image;
+    }
 }
