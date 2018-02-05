@@ -124,7 +124,8 @@ public class AsciiImage {
             }
         }
 
-        return new AsciiImage(newImageContent, newImageWidth, newImageHeight, this.ascii_palette);
+        return new AsciiImage(newImageContent, newImageWidth, newImageHeight,
+                              this.ascii_palette);
     }
 
     public AsciiImage invert() {
@@ -134,7 +135,8 @@ public class AsciiImage {
             newContent[i] = 1 - this.content[i];
         }
 
-        return new AsciiImage(newContent, this.width, this.height, this.ascii_palette);
+        return new AsciiImage(newContent, this.width, this.height,
+                              this.ascii_palette);
     }
 
     public Vector<AsciiImage> splitByThreshold(double threshold) {
@@ -236,7 +238,8 @@ public class AsciiImage {
 
     public static double distance(AsciiImage image1, AsciiImage image2) {
         if (image1.width != image2.width || image1.height != image2.height) {
-            throw new IllegalArgumentException("not valid images. cant handle different size images.");
+            throw new IllegalArgumentException(
+                "not valid images. cant handle different size images.");
         }
 
         double d = 0.0;

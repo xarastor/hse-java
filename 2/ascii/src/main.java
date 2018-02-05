@@ -27,15 +27,14 @@ public final class main {
                     continue;
                 cur = cur.resize(50, 50);
 
-                String filename = "/home/vladimir/tmp/digits/" + real_i + ".png";
+                String filename =
+                    "/home/vladimir/tmp/digits/" + real_i + ".png";
 
                 System.out.println(filename);
                 System.out.println(AsciiImage.distance(cur, cur));
                 System.out.println(cur.getAsciiImage());
 
-                ImageIO.write(
-                    cur.convertToImage(), "png",
-                    new File(filename));
+                ImageIO.write(cur.convertToImage(), "png", new File(filename));
 
                 map.put(real_i, cur);
 
@@ -49,17 +48,21 @@ public final class main {
                           new File("/home/vladimir/tmp/img5.png"));
 
             // print full ascii image
-            final String ascii = image.resize(100, 100).getAsciiImage();
+            final String ascii = image.resize(100, 100).invert().getAsciiImage();
             System.out.println(ascii);
 
+            /*
             Predictor p = new Predictor(map);
 
-            AsciiImage pimage = new AsciiImage(
-                    new File("/home/vladimir/tmp/img9.jpg"), AsciiImage.default_palette).resize(50, 50);
+            AsciiImage pimage =
+                new AsciiImage(new File("/home/vladimir/tmp/img9.jpg"),
+                               AsciiImage.default_palette)
+                    .resize(50, 50);
 
             int value = p.predict(pimage);
             System.out.println(value);
             System.out.println(pimage.getAsciiImage());
+            */
 
             System.exit(0);
         } catch (IOException e) {
