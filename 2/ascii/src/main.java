@@ -88,23 +88,36 @@ public final class main {
     }
 
     public static void main(String[] args) {
-        File f = new File("/home/vladimir/tmp/img3.png");
+        File f = new File("/home/vladimir/tmp/img.png");
 
         try {
             AsciiImage image = new AsciiImage(f, AsciiImage.default_palette);
 
-            image = image.getRectangle(image.getWidth(), 0, 0, image.getHeight());
+            // image = image.getRectangle(image.getWidth(), 0, 0, image.getHeight());
+            // image = image.downscale(100, 100);
 
-            final String ascii = image.getAsciiImage();
-
-
-
-            Vector<AsciiImage> subs = image.splitByThreshold(0.9);
+            // split by lines and resize
+            Vector<AsciiImage> subs = image.splitByThreshold(0.95);
+            int real_i = 1;
             for (int i = 0; i < subs.size(); ++i) {
-                System.out.println(subs.get(i).getAsciiImage());
+                AsciiImage cur = subs.get(i);
+                if (cur.getWidth() < 2 || cur.getHeight() < 2)
+                    continue;
+                cur = cur.resize(50, 50);
+                System.out.println(cur.getAsciiImage());
+
+                ImageIO.write(
+                        cur.convertToImage(), "png", new File("/home/vladimir/tmp/digits/" + real_i + ".png"));
+                real_i = (real_i + 1) % 10;
             }
-            // BufferedImage realImage = image.convertToImage();
-            // ImageIO.write(realImage, "png", new File("/home/vladimir/tmp/img5.png"));
+
+            // print as image
+            // BufferedImage realImage = image.resize(50, 50).convertToImage();
+            BufferedImage realImage = image.scale(0.5).convertToImage();
+            ImageIO.write(realImage, "png", new File("/home/vladimir/tmp/img5.png"));
+
+            // print full ascii image
+            final String ascii = image.resize(100, 100).getAsciiImage();
             System.out.println(ascii);
             System.exit(0);
         } catch (IOException e) {
@@ -112,14 +125,4 @@ public final class main {
         }
     }
 
-    private static BufferedImage toBufferedImage(Image src) {
-        int w = src.getWidth(null);
-        int h = src.getHeight(null);
-        int type = BufferedImage.TYPE_INT_RGB;  // other options
-        BufferedImage dest = new BufferedImage(w, h, type);
-        Graphics2D g2 = dest.createGraphics();
-        g2.drawImage(src, 0, 0, null);
-        g2.dispose();
-        return dest;
-    }
 }

@@ -118,7 +118,7 @@ public class AsciiImage {
         double[] newImageContent = new double[newImageWidth * newImageHeight];
 
         for (int y = y1, i = 0; y < y2; ++y) {
-            int j = y * height + x1;
+            int j = y * width + x1;
             for (int x = x1; x < x2; ++x, ++i, ++j) {
                 newImageContent[i] = this.content[j];
             }
@@ -148,7 +148,7 @@ public class AsciiImage {
         for (int y = 0; y < this.height; ++y) {
             boolean free_line = true;
             for (int x = 0; x < this.width; ++x) {
-                if (this.content[y * this.width + x] >= threshold) {
+                if (this.content[y * this.width + x] <= threshold) {
                     free_line = false;
                     break;
                 }
@@ -162,7 +162,7 @@ public class AsciiImage {
         for (int x = 0; x < this.width; ++x) {
             boolean free_line = true;
             for (int y = 0; y < this.height; ++y) {
-                if (this.content[y * this.width + x] >= threshold) {
+                if (this.content[y * this.width + x] <= threshold) {
                     free_line = false;
                     break;
                 }
@@ -171,7 +171,6 @@ public class AsciiImage {
                 xs.add(x);
             }
         }
-
 
         int yprev = 0;
 
@@ -196,16 +195,47 @@ public class AsciiImage {
         return images;
     }
 
+    public AsciiImage resize(int width, int height) {
+        // algorithm source http://www.cplusplus.com/forum/general/2615/
+
+        double[] newData = new double[width * height];
+
+        double scaleWidth =  (double)width / (double)this.width;
+        double scaleHeight = (double)height / (double)this.height;
+
+        for(int cy = 0; cy < height; cy++) {
+            for(int cx = 0; cx < width; cx++) {
+                int pixel = (cy * (width)) + (cx);
+                int nearestMatch =  (((int)(cy / scaleHeight) * (this.width)) + ((int)(cx / scaleWidth)) );
+
+                newData[pixel] =  this.content[nearestMatch];
+            }
+        }
+
+        AsciiImage newImage = new AsciiImage();
+        newImage.updateImage(newData, width, height);
+        return newImage;
+    }
+
+    public AsciiImage scale(double widthScale, double heightScale) {
+        return this.resize((int) (this.width * widthScale), (int) (this.height * heightScale));
+    }
+
+    public AsciiImage scale(double k) {
+        return this.scale(k, k);
+    }
+
     public BufferedImage convertToImage() throws IOException {
-        byte[] pixels = new byte[this.width * this.height];
+        int[] pixels = new int[this.width * this.height];
         int len = this.width * this.height;
 
         for (int i = 0; i < len; ++i) {
-            pixels[i] = (byte) ((this.content[i]-0.5) *  255 - 128);
-            System.out.println((pixels[i]));
+            int pixel = (int) (this.content[i] * 255);
+            pixels[i] = pixel << 16 | pixel << 8 | pixel;
         }
 
-        BufferedImage image = ImageIO.read(new ByteArrayInputStream(pixels));
+        BufferedImage image = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_RGB);
+        image.setRGB(0, 0, this.width, this.height, pixels, 0, this.width);
         return image;
     }
 }
