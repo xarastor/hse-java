@@ -31,7 +31,11 @@ public final class main {
 
                 ImageIO.write(cur.convertToImage(), "png", new File(filename));
 
-                map.put(real_i, cur);
+                if (real_i == 0)
+                    map.put(real_i, cur);
+                else
+                    map.put(real_i, cur.resize(20, 20));
+
 
                 real_i = (real_i + 1) % 10;
             }
@@ -46,16 +50,33 @@ public final class main {
             System.out.println(ascii);
 
 
-            Predictor p = new Predictor(map);
+            Predictor predictor = new Predictor(map);
 
             AsciiImage pimage =
                 new AsciiImage(new File("input_images/digit_test.jpg"), AsciiImage.default_palette)
-                    .resize(50, 50);
-
-            int value = p.predict(pimage);
+                    .resize(40, 40);
 
             System.out.println(pimage.getAsciiImage());
-            System.out.println("Predicted value: " + value);
+            System.out.println("Predicted values: ");
+
+            int n = 10;
+            Thread[] threads = new Thread[n];
+            AsyncPrediction[] predictions = new AsyncPrediction[n];
+            for (int i = 0; i < n; ++i) {
+                predictions[i] = new AsyncPrediction(predictor, pimage);
+                threads[i] = new Thread(predictions[i]);
+                threads[i].start();
+            }
+
+            for (int i = 0; i < n; ++i) {
+                try {
+                    threads[i].join();
+                    System.out.println(predictions[i].getPrediction());
+                } catch (Exception e) {
+                    System.out.println("Exception in join loop");
+                    return;
+                }
+            }
 
             System.exit(0);
         } catch (IOException e) {
