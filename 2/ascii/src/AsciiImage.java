@@ -63,6 +63,11 @@ public class AsciiImage {
     }
 
     public void updateImage(double[] content, int width, int height) {
+        for (double c : content) {
+            if (c < 0 || c > 1) {
+                throw new ValueException("invalid content");
+            }
+        }
         if (content.length != width * height) {
             throw new ValueException("invalid width and height");
         }
