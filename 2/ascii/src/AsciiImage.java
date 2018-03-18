@@ -1,3 +1,5 @@
+import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
+
 import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -13,7 +15,7 @@ public class AsciiImage {
     private int height = 0;
 
     static char[] default_palette =
-        "MWNXK0Okxdolc:;,'...   ".toCharArray(); // {' ', '.', '*', '#'};
+            "MWNXK0Okxdolc:;,'...   ".toCharArray(); // {' ', '.', '*', '#'};
     private char[] ascii_palette = default_palette;
 
     public AsciiImage() {
@@ -37,7 +39,7 @@ public class AsciiImage {
     public AsciiImage(double[] content, int width, int height, char[] palette) {
         this();
         this.updateImage(content, width, height);
-        this.setPalette(ascii_palette);
+        this.setPalette(palette);
     }
 
     public void updateImage(final BufferedImage image) {
@@ -61,6 +63,14 @@ public class AsciiImage {
     }
 
     public void updateImage(double[] content, int width, int height) {
+        for (double c : content) {
+            if (c < 0 || c > 1) {
+                throw new ValueException("invalid content");
+            }
+        }
+        if (content.length != width * height) {
+            throw new ValueException("invalid width and height");
+        }
         this.width = width;
         this.height = height;
         this.content = content;
@@ -75,7 +85,7 @@ public class AsciiImage {
         for (int y = 0, i = 0; y < this.height; ++y) {
             for (int x = 0; x < this.width; ++x, ++i) {
                 int pos = (int)Math.round((ascii_palette.length - 1) *
-                                          this.content[i]);
+                        this.content[i]);
                 ascii.append(ascii_palette[pos]);
             }
             ascii.append("\n");
@@ -96,7 +106,7 @@ public class AsciiImage {
         int height = this.height;
 
         if (x1 > width || x1 < 0 || x2 > width || x2 < 0 || y1 > height ||
-            y1 < 0 || y2 > height || y2 < 0) {
+                y1 < 0 || y2 > height || y2 < 0) {
             throw new IllegalArgumentException("point value out of range");
         }
 
@@ -125,7 +135,7 @@ public class AsciiImage {
         }
 
         return new AsciiImage(newImageContent, newImageWidth, newImageHeight,
-                              this.ascii_palette);
+                this.ascii_palette);
     }
 
     public AsciiImage invert() {
@@ -136,7 +146,7 @@ public class AsciiImage {
         }
 
         return new AsciiImage(newContent, this.width, this.height,
-                              this.ascii_palette);
+                this.ascii_palette);
     }
 
     public Vector<AsciiImage> splitByThreshold(double threshold) {
@@ -203,7 +213,7 @@ public class AsciiImage {
             for (int cx = 0; cx < width; cx++) {
                 int pixel = (cy * (width)) + (cx);
                 int nearestMatch = (((int)(cy / scaleHeight) * (this.width)) +
-                                    ((int)(cx / scaleWidth)));
+                        ((int)(cx / scaleWidth)));
 
                 newData[pixel] = this.content[nearestMatch];
             }
@@ -214,7 +224,7 @@ public class AsciiImage {
 
     public AsciiImage scale(double widthScale, double heightScale) {
         return this.resize((int)(this.width * widthScale),
-                           (int)(this.height * heightScale));
+                (int)(this.height * heightScale));
     }
 
     public AsciiImage scale(double k) {
@@ -231,7 +241,7 @@ public class AsciiImage {
         }
 
         BufferedImage image = new BufferedImage(this.width, this.height,
-                                                BufferedImage.TYPE_INT_RGB);
+                BufferedImage.TYPE_INT_RGB);
         image.setRGB(0, 0, this.width, this.height, pixels, 0, this.width);
         return image;
     }
@@ -239,7 +249,7 @@ public class AsciiImage {
     public static double distance(AsciiImage image1, AsciiImage image2) {
         if (image1.width != image2.width || image1.height != image2.height) {
             throw new IllegalArgumentException(
-                "not valid images. cant handle different size images.");
+                    "not valid images. cant handle different size images.");
         }
 
         double d = 0.0;
