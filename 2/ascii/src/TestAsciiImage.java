@@ -9,7 +9,7 @@ public class TestAsciiImage extends TestCase {
         char[] palette = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         asciiImage = new AsciiImage(content, 2, 2, palette);
         String result = asciiImage.invert().getAsciiImage();
-        assertEquals("43\n28\n", result);
+        assertEquals("56\n72\n", result);
 
         asciiImage = asciiImage.invert().invert();
         assertEquals((new AsciiImage(content, 2, 2, palette)).getAsciiImage(), asciiImage.getAsciiImage());
