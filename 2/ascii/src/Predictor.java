@@ -5,6 +5,9 @@ import java.util.HashMap;
 
 public class Predictor {
     private Map<Integer, AsciiImage> map;
+    /*
+    * Из кода не совсем понятно, зачем необходимо использование именно map
+    */ 
     private int mappedWidth = -1;
     private int mappedHeight = -1;
 
@@ -30,6 +33,9 @@ public class Predictor {
                 mappedWidth = width;
             if (height > mappedHeight)
                 mappedHeight = height;
+            /*
+            * Можно переписать как mappedWidth = max(mappedWidth, width) тогда будет более понятен код
+            */
         }
 
         // save resized images
