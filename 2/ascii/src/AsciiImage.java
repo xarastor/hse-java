@@ -17,7 +17,9 @@ public class AsciiImage {
     static char[] default_palette =
             "MWNXK0Okxdolc:;,'...   ".toCharArray(); // {' ', '.', '*', '#'};
     private char[] ascii_palette = default_palette;
-
+    /*
+    * Нарушение JCC нельзя использовать нижние подчеркивания в названиях переменных
+    */
     public AsciiImage() {
     }
 
@@ -107,6 +109,10 @@ public class AsciiImage {
 
         if (x1 > width || x1 < 0 || x2 > width || x2 < 0 || y1 > height ||
                 y1 < 0 || y2 > height || y2 < 0) {
+            
+            /*
+            * Подобные проверки лучше выносить в отдельные функции (или даже создать класс Rectangle) для лучшей читаемости кода
+            */
             throw new IllegalArgumentException("point value out of range");
         }
 
@@ -130,6 +136,10 @@ public class AsciiImage {
         for (int y = y1, i = 0; y < y2; ++y) {
             int j = y * width + x1;
             for (int x = x1; x < x2; ++x, ++i, ++j) {
+                
+            /*
+            * Очень трудно разобраться в том, что делает этот код лучше переписать, чтобы итерирование происходило конкретно по i и j
+            */
                 newImageContent[i] = this.content[j];
             }
         }
