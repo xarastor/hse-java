@@ -6,6 +6,11 @@ import java.util.Vector;
 import java.util.Map;
 import java.util.HashMap;
 
+/* Comment
+* Нет использования входных параметров, то есть мы не можем никак изменить поведение программы извне кода
+* Нет подсказки о пользовании программы для пользователя
+*/
+
 public final class main {
 
     public static void main(String[] args) {
@@ -16,9 +21,20 @@ public final class main {
 
             // split by lines and resize
             Vector<AsciiImage> subs = image.splitByThreshold(0.95);
+            /*
+            * Все константы стоит выносить в отдельные переменные с осмысленными названиями (к примеру defaultTreshhold)
+            */
             Map<Integer, AsciiImage> map = new HashMap<>();
             int real_i = 1;
+            
+            /*
+            * Нарушение JCC нельзя использовать нижнее подчеркивание в названиях переменных
+            */
             for (AsciiImage cur : subs) {
+                /*
+                * "cur" - это плохое название для перменной, так как не является осмысленным.
+                * Лучше назвать эту переменную currentImage, тогда далее по контексту будет понятно, что обозначает эта переменная
+                */
                 if (cur.getWidth() < 2 || cur.getHeight() < 2)
                     continue;
                 cur = cur.resize(50, 50);
@@ -72,7 +88,11 @@ public final class main {
                 try {
                     threads[i].join();
                     System.out.println(predictions[i].getPrediction());
-                } catch (Exception e) {
+                } catch (Exception e) { 
+                    /* Слишком общий Exception он отловит все исключения и будет непонятно что конкрентно произошло
+                    * Если есть подозрения о возможных ошибках, то лучше отловить только их, и если возникает какое-то другое исключение
+                    * то будет понятно, что необходимо поправить и изменить.
+                    */
                     System.out.println("Exception in join loop");
                     return;
                 }
